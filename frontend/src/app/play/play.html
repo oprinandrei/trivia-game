@@ -1,0 +1,156 @@
+<div class="play-screen">
+  @if (!joined()) {
+    <div class="join-card card">
+      <h1>Join Trivia</h1>
+      <input
+        type="text"
+        placeholder="Your nickname"
+        [(ngModel)]="nicknameInput"
+        (keyup.enter)="join()"
+        maxlength="20"
+      />
+      <button class="btn" [disabled]="joining() || !nicknameInput().trim()" (click)="join()">
+        {{ joining() ? 'Joining…' : 'Join' }}
+      </button>
+      @if (joinError(); as err) {
+        <p class="error">{{ err }}</p>
+      }
+    </div>
+  } @else {
+    <header>
+      <span class="pill">{{ gs.nickname() }}</span>
+      @if (gs.phase() !== 'LOBBY' && gs.phase() !== 'GAME_END') {
+        <span class="pill">Round {{ gs.roundIndex() + 1 }}/{{ gs.roundsTotal() }}</span>
+      }
+      @if (myRank(); as rank) {
+        <span class="pill accent">Rank #{{ rank }}</span>
+      }
+    </header>
+
+    @if (gs.paused() && gs.phase() !== 'LOBBY' && gs.phase() !== 'GAME_END') {
+      <div class="banner paused">Game paused — hang tight</div>
+    }
+
+    @switch (gs.phase()) {
+      @case ('LOBBY') {
+        <section class="waiting">
+          <h2>You're in!</h2>
+          <p>Waiting for the host to start the game…</p>
+          <p class="hint">{{ gs.players().length }} player(s) in the lobby</p>
+        </section>
+      }
+
+      @case ('CATEGORY_VOTE') {
+        <section class="vote">
+          <h2>Pick a category <app-countdown [deadline]="gs.deadline()" [paused]="gs.paused()" /></h2>
+          <div class="cat-grid">
+            @for (c of gs.categoryOptions(); track c.id) {
+              <button
+                class="cat-btn"
+                [class.selected]="myVoteCategoryId() === c.id"
+                [disabled]="myVoteCategoryId() !== null"
+                (click)="vote(c.id)"
+              >
+                {{ c.name }}
+              </button>
+            }
+          </div>
+          @if (myVoteCategoryId() !== null) {
+            <p class="hint">Vote submitted — waiting for others…</p>
+          }
+        </section>
+      }
+
+      @case ('CATEGORY_RESULT') {
+        @if (gs.categoryResult(); as cr) {
+          <section class="vote">
+            <h2>🏆 {{ cr.categoryName }} wins!</h2>
+            <p class="hint">Get ready…</p>
+          </section>
+        }
+        <app-transition-overlay label="Next question in" [deadline]="gs.deadline()" [paused]="gs.paused()" />
+      }
+
+      @case ('QUESTION_ACTIVE') {
+        @if (gs.currentQuestion(); as q) {
+          <section class="question">
+            <div class="q-meta">
+              <span class="pill">{{ q.categoryName }}</span>
+              <app-countdown [deadline]="gs.deadline()" [paused]="gs.paused()" />
+            </div>
+            <h2 class="q-text">{{ q.text }}</h2>
+            <div class="options">
+              @for (o of q.options; track o.id) {
+                <button
+                  class="option-btn"
+                  [class.selected]="gs.myAnswerOptionId() === o.id"
+                  [disabled]="gs.myAnswerOptionId() !== null"
+                  (click)="answer(o.id)"
+                >
+                  {{ o.text }}
+                </button>
+              }
+            </div>
+            @if (gs.myAnswerOptionId() !== null) {
+              <p class="hint">Answer locked in — waiting for others…</p>
+            }
+          </section>
+        }
+      }
+
+      @case ('REVEAL') {
+        @if (myReveal(); as res) {
+          <section class="reveal" [class.correct]="res.correct" [class.wrong]="!res.correct">
+            <h2>{{ res.correct ? 'Correct!' : (res.optionId ? 'Wrong!' : "Time's up!") }}</h2>
+            @if (gs.currentQuestion(); as q) {
+              <div class="options">
+                @for (o of q.options; track o.id) {
+                  <div
+                    class="option-btn result"
+                    [class.correct-option]="o.id === gs.reveal()?.correctOptionId"
+                    [class.my-wrong-option]="o.id === res.optionId && !res.correct"
+                  >
+                    {{ o.text }}
+                  </div>
+                }
+              </div>
+            }
+            <p class="points">+{{ res.points }} points</p>
+            <p class="hint">Your score: {{ gs.me()?.score ?? 0 }}</p>
+          </section>
+        }
+        <app-transition-overlay label="Next question in" [deadline]="gs.deadline()" [paused]="gs.paused()" />
+      }
+
+      @case ('ROUND_SUMMARY') {
+        @if (gs.roundSummary(); as rs) {
+          <section class="round-summary">
+            <h2>Round {{ rs.roundIndex + 1 }} complete</h2>
+            <ol class="leaderboard">
+              @for (e of rs.leaderboard; track e.playerId) {
+                <li [class.me]="e.playerId === gs.playerId()">{{ e.nickname }} — {{ e.score }}</li>
+              }
+            </ol>
+          </section>
+        }
+        <app-transition-overlay label="Next round in" [deadline]="gs.deadline()" [paused]="gs.paused()" />
+      }
+
+      @case ('GAME_END') {
+        @if (gs.gameEnd(); as ge) {
+          <section class="game-end">
+            <h2>Game over</h2>
+            @if (ge.winner; as w) {
+              <p class="winner">🏆 {{ w.nickname }} wins!</p>
+            }
+            <ol class="leaderboard">
+              @for (e of ge.leaderboard; track e.playerId) {
+                <li [class.me]="e.playerId === gs.playerId()">{{ e.nickname }} — {{ e.score }}</li>
+              }
+            </ol>
+          </section>
+        }
+      }
+    }
+  }
+</div>

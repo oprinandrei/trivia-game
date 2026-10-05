@@ -1,0 +1,129 @@
+:root {
+  /* Soft Rainbow palette */
+  --lemon-chiffon: #fbf8cc;
+  --powder-petal: #fde4cf;
+  --cotton-rose: #ffcfd2;
+  --pink-orchid: #f1c0e8;
+  --periwinkle: #cfbaf0;
+  --baby-blue-ice: #a3c4f3;
+  --sky-blue: #90dbf4;
+  --electric-aqua: #8eecf5;
+  --soft-cyan: #98f5e1;
+  --celadon: #b9fbc0;
+
+  /* Semantic tokens, built from the palette above */
+  --bg: var(--lemon-chiffon);
+  --bg-elevated: #fffdf7;
+  --card: #ffffff;
+  --border: var(--periwinkle);
+  --text: #3d3552;
+  --text-dim: #756c92;
+  --accent: var(--periwinkle);
+  --accent-2: var(--electric-aqua);
+  --good: var(--celadon);
+  --bad: var(--cotton-rose);
+  --warn: var(--lemon-chiffon);
+
+  /* Same-hue, deeper tones used only where a flat pastel wash would be
+     unreadable as text/icons (correct/wrong marks, error copy, low-timer
+     digits, accent labels) — every background, border, gradient and accent
+     fill stays a literal palette color; these exist solely for legibility
+     of small text/icons set directly on white/pastel surfaces. */
+  --good-strong: #2f9e63;
+  --bad-strong: #e2617a;
+  --warn-strong: #b89327;
+  --accent-strong: #7c5cd6;
+  --accent-2-strong: #12a8ae;
+
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: linear-gradient(
+    160deg,
+    var(--lemon-chiffon) 0%,
+    var(--powder-petal) 18%,
+    var(--cotton-rose) 34%,
+    var(--pink-orchid) 50%,
+    var(--periwinkle) 64%,
+    var(--baby-blue-ice) 78%,
+    var(--sky-blue) 90%,
+    var(--electric-aqua) 100%
+  );
+  background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.5em;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.75em 1.5em;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--text);
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--pink-orchid);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn.secondary {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.btn.danger {
+  background: var(--bad);
+  color: var(--text);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5em;
+  box-shadow: 0 8px 24px rgba(61, 53, 82, 0.12);
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  font-size: 0.85em;
+  color: var(--text-dim);
+}

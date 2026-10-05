@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/.angular
+backend/dist
+frontend/dist
+.git
+.gitignore
+PLAN.md
